@@ -10,6 +10,7 @@ export async function callApiTranscribeFile(user, file) {
         if (typeof file == "object") {        
             formData.append('file', file)
         }     
+        console.log( api.authBearer2 )
         const { data } = await axios.post(`${api.url}/transcribe/video-file`, formData, {
             headers: api.authBearer2
         })

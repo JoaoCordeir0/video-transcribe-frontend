@@ -14,22 +14,26 @@
                 <ul class="navbar-nav ms-lg-5 me-lg-auto"></ul>
 
                 <div class="d-none d-lg-block">
-                    <a href="#" class="navbar-icon bi-person smoothscroll" data-bs-toggle="modal" data-bs-target="#exampleModal"></a>
+                    <a href="#" class="navbar-icon bi-person smoothscroll" data-bs-toggle="modal" data-bs-target="#modalLogin" id="btn-show-modal-login"></a>
                 </div>
             </div>
         </div>
     </nav>
     
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="modalLogin" tabindex="-1" aria-labelledby="modalLoginLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-person-circle"></i> Minha conta</h5>
+                    <h5 class="modal-title" id="modalLoginLabel"><i class="bi bi-person-circle"></i> Minha conta</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div v-if="userLogged" class="modal-body" id="modal-body-logged-in">
-                    <p>User logado: {{ userName }}</p>
-                    <p><a href="#logout" v-on:click="logout()"><u>Sair</u></a></p>
+                    <p>User logado: <b>{{ userName }}</b></p>
+                    <p>Email: <b>{{ userEmail }}</b></p>
+                    <p>Plano atual: <b>{{ userPlan }}</b></p>
+                    <p class="d-flex justify-content-center">
+                        <button class="btn btn-warning p-2 px-5" v-on:click="logout()">Sair</button>
+                    </p>
                 </div>
                 <div v-else class="modal-body" id="modal-body-logged-out">
                     <div class="">
@@ -66,39 +70,52 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import Modal from './Modal.vue';
-import { userLoggedIn } from '../hooks/useAuth';
-import { getUserName } from '../hooks/useUser';
+import { apiLogin, userLoggedIn } from '../hooks/useAuth';
+import { getUserEmail, getUserName, getUserPlan } from '../hooks/useUser';
+import { Toast } from '../hooks/useToast';
 
 export default defineComponent({
 
     setup() {
         const userLogged = ref(false)
         const userName = ref()
+        const userEmail = ref()
+        const userPlan = ref()
         const email = ref()
         const password = ref()
 
-        async function login() {
-            console.log("teste")
-        }
-
-        return {
-            login,
+        return {            
             userLogged,
             userName,
+            userEmail,
+            userPlan,
             email,
             password,
         }
     },
     methods: {
+        async login() {            
+            const result = await apiLogin(this.email, this.password)
+            
+            if (result.status == 'success') {
+                Toast().fire({ icon: 'success', title: `Bem vindo ${result.user.name}` })
+                this.checkAuth()
+            } else {
+                Toast().fire({ icon: 'error', title: 'Usuário ou senha incorretos!' })
+            }
+        },
         checkAuth() {
             this.userLogged = userLoggedIn()
 
             if (this.userLogged) {
                 this.userName = getUserName()
+                this.userEmail = getUserEmail()
+                this.userPlan = getUserPlan()
             }
         },       
         logout() {
             localStorage.clear()
+            Toast().fire({ icon: 'info', title: 'Até logo!' })
             this.checkAuth()
         }
     },

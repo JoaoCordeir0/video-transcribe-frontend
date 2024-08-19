@@ -44,12 +44,17 @@
                     <div class="custom-block bg-white shadow-lg">
                         <a href="#">
                             <div class="d-flex">
-                                <div>
-                                    <h5 class="mb-2">Resumos</h5>
-                                    <p class="mb-0">When you search for free CSS templates, you will notice that
-                                        TemplateMo is one of the best websites.</p>
-                                </div>
-                                <span class="badge bg-design rounded-pill ms-auto">14</span>
+                                <div class="d-block">
+                                    <div>
+                                        <h5 class="mb-2">Resumos</h5>
+                                        <p class="mb-0">Transcreva seu vídeo e opte por resumos com nossa ferramenta</p>
+                                    </div>
+                                    <div class="mt-5">
+                                        <h5 class="mb-2">Legendas</h5>
+                                        <p class="mb-0">Gere legendas de qualidade para seus vídeos</p>
+                                    </div>
+                                </div>                    
+                                <span class="badge bg-design rounded-pill ms-auto">01</span>
                             </div>
                         </a>
                     </div>
@@ -60,13 +65,8 @@
                             <img src="businesswoman-using-tablet-analysis.jpg" class="custom-block-image img-fluid" alt="">
                             <div class="custom-block-overlay-text d-flex">
                                 <div>
-                                    <h5 class="text-white mb-2">Legendas</h5>
-
-                                    <p class="text-white">Topic Listing Template includes homepage, listing page,
-                                        detail page, and contact page. You can feel free to edit and adapt for your
-                                        CMS requirements.</p>
                                 </div>
-                                <span class="badge bg-finance rounded-pill ms-auto">25</span>
+                                <span class="badge bg-finance rounded-pill ms-auto">02</span>
                             </div>
                             <div class="section-overlay"></div>
                         </div>
@@ -82,6 +82,7 @@ import { defineComponent, ref } from 'vue';
 import Spinner from '../components/Spinner.vue';
 import { getUserID } from '../hooks/useUser';
 import { callApiTranscribeFile } from '../hooks/useFile';
+import { Toast } from '../hooks/useToast';
 
 export default defineComponent({
     setup(){
@@ -99,8 +100,20 @@ export default defineComponent({
         },
         async sendFile() {
             let userID = getUserID()
+
+            if (userID == undefined) {
+                var modalLogin = document.getElementById('btn-show-modal-login');
+                modalLogin?.click()
+                return
+            }
+            
             const result = await callApiTranscribeFile(userID, this.file)
-            console.log(result)
+            
+            if (result.status == 'success') {
+                Toast().fire({ icon: 'success', title: `Processo iniciado` })                
+            } else {
+                Toast().fire({ icon: 'error', title: 'Erro ao realizar tarefa, tente mais tarde!' })
+            }
         },
         async sendLink() {
             

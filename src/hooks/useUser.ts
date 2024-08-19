@@ -11,3 +11,11 @@ export function getUserID() {
 export function getUserName() { 
     return localStorage.getItem('user-name')
 }
+
+export function getUserEmail() { 
+    return localStorage.getItem('user-email')
+}
+
+export function getUserPlan() { 
+    return localStorage.getItem('user-plan-name')
+}

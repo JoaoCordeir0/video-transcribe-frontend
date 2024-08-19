@@ -13,13 +13,15 @@ export async function apiLogin(email, password) {
 
     const { data } = await axios.post(`${endpointUrl}/user/login`, params)
 
-    if (data.token != undefined) 
+    if (data.access_token != undefined) 
     {       
-        localStorage.clear()
-        localStorage.setItem('user-token', data.token)     
+        localStorage.clear()        
         localStorage.setItem('user-id', data.user.id)     
         localStorage.setItem('user-name', data.user.name)     
         localStorage.setItem('user-email', data.user.email)             
+        localStorage.setItem('user-plan-name', data.user.plan.title)             
+        localStorage.setItem('user-plan-validity', data.user.plan.validity)             
+        localStorage.setItem('user-token', data.access_token)     
         localStorage.setItem('user-auth-day', (new Date()).getDate().toString())        
     }
 
@@ -33,9 +35,9 @@ export function auth(to, from, next) {
 
 export function userLoggedIn() {
     let user_id = localStorage.getItem('user-id')     
-    let user_name = localStorage.getItem('user-name')     
+    let user_token = localStorage.getItem('user-token')     
 
-    if (user_id != undefined && user_name != undefined) {
+    if (user_id != undefined && user_token != undefined) {
         return true
     }
     return false
