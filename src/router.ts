@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import { authBasic, authAdmin, authAdvisor, authAuthor } from './hooks/useAuth'
+import { auth } from './hooks/useAuth'
 
 import Main from './views/Main.vue';
+import Plans from './views/Plans.vue';
+import NotFound from './views/NotFound.vue';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -9,6 +11,18 @@ const routes: RouteRecordRaw[] = [
     name: 'Main',
     component: Main,
     meta: { layout: 'default' },
+  },
+  {
+    path: '/plans',
+    name: 'Plans',
+    component: Plans,
+    meta: { layout: 'default' },
+  },
+  { 
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFound,
+    meta: { layout: 'empty' },
   },
 ];
 

@@ -1167,5 +1167,13 @@ blockquote {
   h5 {
     font-size: 20px;
   }
+
+  .title-tool{
+    font-size: 18px;
+  }
+
+  #btn-show-modal-login{
+    display: none;
+  }
 }
 

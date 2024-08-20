@@ -63,10 +63,10 @@
                     <div class="custom-block custom-block-overlay">
                         <div class="d-flex flex-column h-100">
                             <img src="businesswoman-using-tablet-analysis.jpg" class="custom-block-image img-fluid" alt="">
-                            <div class="custom-block-overlay-text d-flex">
-                                <div>
+                            <div class="custom-block-overlay-text">
+                                <div v-for="item in my_transcribes">
+                                    <p class="mb-0">Transcreva seu vídeo e opte por resumos com nossa ferramenta</p>
                                 </div>
-                                <span class="badge bg-finance rounded-pill ms-auto">02</span>
                             </div>
                             <div class="section-overlay"></div>
                         </div>
@@ -80,16 +80,18 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import Spinner from '../components/Spinner.vue';
-import { getUserID } from '../hooks/useUser';
+import { callApiMyTranscribes, getUserID, getUserToken } from '../hooks/useUser';
 import { callApiTranscribeFile } from '../hooks/useFile';
 import { Toast } from '../hooks/useToast';
 
 export default defineComponent({
     setup(){
+        const my_transcribes = ref()
         const file = ref()        
         const link = ref("")
 
         return {
+            my_transcribes,
             file,
             link,
         }
@@ -118,9 +120,16 @@ export default defineComponent({
         async sendLink() {
             
         },
+        async loadTranscribes() {
+            if (getUserToken() != undefined) {
+                const result = await callApiMyTranscribes()
+                this.my_transcribes = result[0]
+                console.log(result['data'])
+            }
+        }
     },  
     beforeMount() {        
-        console.log('teste')
+        this.loadTranscribes()
     },
     components: {        
         Spinner  

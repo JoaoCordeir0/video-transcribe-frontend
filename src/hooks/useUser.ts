@@ -19,3 +19,18 @@ export function getUserEmail() {
 export function getUserPlan() { 
     return localStorage.getItem('user-plan-name')
 }
+
+export function getUserToken() {
+    return localStorage.getItem('user-token')
+}
+
+export async function callApiMyTranscribes() {
+    try {
+        const { data } = await axios.get(`${api.url}/transcribes`, {
+            headers: api.authBearer2
+        })
+        return data
+    } catch {
+        return 'error'
+    }    
+}
