@@ -3,7 +3,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-12 mx-auto">
-                    <h1 class="text-white text-center">Transcreva seu vídeo</h1>
+                    <h1 class="text-white text-center">Transcreva seus vídeos</h1>
                     <h6 class="text-center">Gere resumos e legendas em vários idiomas</h6>
                     <nav>
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -62,23 +62,33 @@
                 <div class="col-lg-6 col-12">
                     <div class="custom-block custom-block-overlay">
                         <div class="d-flex flex-column h-100">
-                            <img src="businesswoman-using-tablet-analysis.jpg" class="custom-block-image img-fluid" alt="">
-                            <div class="custom-block-overlay-text">
-                                <h5 class="mb-2 text-white bold">Histórico de vídeos</h5>
+                            <img src="transcricao-de-audio.png" class="custom-block-image img-fluid" alt="">
+                            <div class="custom-block-overlay-text">          
+                                <h5 class="mb-2 text-white bold">Pŕevia dos meus vídeos</h5>
+                                
+                                <div v-if="loading">
+                                    <Loading/>
+                                </div>                                                                                      
                                 <div v-if="issetTranscribes()" v-for="(item, index) in my_transcribes">
-                                    <p class="mb-0 bg-light rounded p-2 fs-6 mb-2">                                        
-                                        <span>{{ item.video_name }}</span>
-                                        <span class="float-end">{{ item.progress }}% <span v-if="item.progress == 100">✅</span></span>                                                                                    
-                                    </p>
+                                    <div class="mb-0 bg-light rounded p-2 fs-6 mb-2 video-item">    
+                                        <a v-if="item.progress == 100" :href="'/video/' + item.id" class="text-secondary">
+                                            <span>{{ item.video_name }} <i class="bi bi-arrow-up-right-square-fill"></i></span>    
+                                        </a>  
+                                        <a v-else href="#" class="text-secondary">
+                                            <span>{{ item.video_name }}</span>    
+                                        </a>                                                                       
+                                        <span class="float-end text-secondary">
+                                            <span v-if="item.progress == 100">100% ✅</span>
+                                            <span v-else-if="item.progress == -1">Erro ❌</span>
+                                            <span v-else>{{ item.progress }}% 🌀</span>                                            
+                                        </span>
+                                    </div>                                   
                                 </div>
                                 <div v-else>
                                     <p class="mb-0 bg-light rounded p-2 fs-6 mb-2">
                                         Nenhum histórico disponível
                                     </p>
-                                </div>
-                                <div>
-                                    <Preloader/>
-                                </div>
+                                </div>                                
                             </div>
                             <div class="section-overlay"></div>
                         </div>
@@ -91,22 +101,23 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import Spinner from '../components/Spinner.vue';
 import { callApiMyTranscribes, getUserID, getUserToken } from '../hooks/useUser';
 import { callApiTranscribeFile } from '../hooks/useFile';
 import { Toast } from '../hooks/useToast';
-import Preloader from '../components/Preloader.vue';
+import Loading from '../components/Loading.vue';
 
 export default defineComponent({
     setup(){
         const my_transcribes = ref()
         const file = ref()        
         const link = ref("")
+        const loading = ref(false)
 
         return {
             my_transcribes,
             file,
             link,
+            loading,
         }
     }, 
     methods: {             
@@ -132,6 +143,7 @@ export default defineComponent({
                 return
             }
             
+            this.loading = true
             const result = await callApiTranscribeFile(userID, this.file)
             
             if (result.status == 'success') {
@@ -141,7 +153,15 @@ export default defineComponent({
             }
             
             var loop = setInterval(async () => {      
-                if (await this.loadTranscribes() == 100) {
+                await this.loadTranscribes()
+                this.loading = false
+                let flag = true
+                this.my_transcribes.forEach(element => {
+                    if (element.progress < 100) {
+                        flag = false
+                    }
+                })
+                if (flag) {
                     clearInterval(loop)
                 }
             }, 5 * 1000); // A cada 5 segundos
@@ -153,7 +173,6 @@ export default defineComponent({
             if (getUserToken() != undefined) {
                 const result = await callApiMyTranscribes()
                 this.my_transcribes = result['data']
-                console.log(result['data'][0]['progress'])
                 return result['data'][0]['progress']
             }
             return 0
@@ -169,9 +188,8 @@ export default defineComponent({
     beforeMount() {        
         this.loadTranscribes()
     },
-    components: {        
-        Spinner,
-        Preloader
+    components: {                
+        Loading
     },
 })
 </script>

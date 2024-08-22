@@ -34,3 +34,14 @@ export async function callApiMyTranscribes() {
         return 'error'
     }    
 }
+
+export async function callApiMyTranscribe(id) {
+    try {
+        const { data } = await axios.get(`${api.url}/transcribe/${id}`, {
+            headers: api.authBearer2
+        })
+        return data
+    } catch {
+        return 'error'
+    }    
+}

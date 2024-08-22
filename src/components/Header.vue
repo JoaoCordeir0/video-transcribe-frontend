@@ -19,7 +19,10 @@
                         <a class="nav-link click-scroll" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link click-scroll" href="/plans">Plans</a>
+                        <a class="nav-link click-scroll" href="/plans">Planos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link click-scroll" href="/videos">Meus Vídeos</a>
                     </li>
                 </ul>
 
@@ -108,8 +111,7 @@ export default defineComponent({
             const result = await apiLogin(this.email, this.password)
             
             if (result.status == 'success') {
-                Toast().fire({ icon: 'success', title: `Bem vindo ${result.user.name}` })
-                this.checkAuth()
+                window.location.reload()
             } else {
                 Toast().fire({ icon: 'error', title: 'Usuário ou senha incorretos!' })
             }

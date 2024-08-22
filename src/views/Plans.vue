@@ -39,7 +39,6 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import Spinner from '../components/Spinner.vue';
 import { callApiPlans } from '../hooks/usePlan';
 
 export default defineComponent({
@@ -60,7 +59,7 @@ export default defineComponent({
         this.loadPlans()
     },
     components: {        
-        Spinner  
+          
     },
 })
 </script>

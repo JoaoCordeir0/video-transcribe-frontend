@@ -399,6 +399,14 @@ strong {
   border: 0;
 }
 
+.progress {
+  height: 20px !important;
+}
+
+.video-item:hover {
+  background: var(--link-hover-color) !important;  
+}
+
 @media screen and (min-width: 992px) {
   .navbar .dropdown:hover .dropdown-menu {
     opacity: 1;
