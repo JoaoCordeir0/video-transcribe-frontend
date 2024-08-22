@@ -172,7 +172,7 @@ export default defineComponent({
         async loadTranscribes() {
             if (getUserToken() != undefined) {
                 const result = await callApiMyTranscribes()
-                this.my_transcribes = result['data']
+                this.my_transcribes = result['data'].slice(0, 5)
                 return result['data'][0]['progress']
             }
             return 0
