@@ -14,7 +14,7 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div v-for="(item, index) in plans" class="col-lg-4 col-12 mb-4 mb-lg-0">
-                                    <div class="custom-block bg-white shadow-lg">
+                    <div class="custom-block bg-white shadow-lg">
                         <div class="d-flex">
                             <div class="w-100">
                                 <h5 class="mb-2">{{ item.title }}</h5>
@@ -23,7 +23,8 @@
                                 <p v-else class="mt-2"><b>Gratuito</b></p>
                                 <p v-if="index != 0" class="mt-0">Válido por 30 dias</p>
                                 <div class="d-flex justify-content-center">
-                                    <button v-if="index != 0" class="btn btn-success" @click="() => showModal(item.price)"><i class="bi bi-cash-stack"></i>
+                                    <button v-if="index != 0" class="btn btn-success"
+                                        @click="() => showModal(item.price, index)"><i class="bi bi-cash-stack"></i>
                                         <b>Comprar</b></button>
                                 </div>
                             </div>
@@ -35,48 +36,38 @@
         </div>
     </section>
 
-<ElDialog v-model="dialogVisible" title="Gerar código pix" :append-to-body="true">
-                    <div v-if="loading">
-                </div>
-                <div v-else>
-                    <!-- Exibe o QR Code -->
-                    <QrCodeVue :value="pixCopiaECola" :size="200" v-if="pixCopiaECola" />
 
-                    <!-- Exibe o código PIX copia e cola -->
-                    <div v-if="pixCopiaECola" class="pix-code">
-                    <p><strong>PIX Copia e Cola:</strong></p>
-                    <el-input v-model="pixCopiaECola"></el-input>
-                    <el-button icon="el-icon-document-copy" @click="">
-                        Copiar
-                    </el-button>
-                    </div>
-                </div>
-
-                <span slot="footer" class="dialog-footer">
-                    <el-button @click="$emit('toggleDialog')">Fechar</el-button>
-                </span>
-                </ElDialog>
+    <RegisterModal v-if="!loggedIn" @close="handleClose"/>
+    <PaymentModal v-else :loading="loading" :pix-code="pixCopiaECola" />
 
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { callApiPlans } from '../hooks/usePlan';
-import { ElButton, ElDialog, ElInput } from 'element-plus';
- import  QrCodeVue from 'qrcode.vue';
 import axios from 'axios';
+import { userLoggedIn } from '../hooks/useAuth';
+import PaymentModal from '../components/PaymentModal.vue';
+import RegisterModal from '../components/RegisterModal.vue';
+import { callUpdatePlan, updateUserPlan } from '../hooks/useUser';
+import { TOGGLE_DIALOG, useEventBus, USER_UPDATE } from '../hooks/useEventBus';
+import { reactive } from 'vue';
 
 export default defineComponent({
     setup(){
         const plans = ref()
-        const  dialogVisible= ref(false);
+        const  dialogVisible= reactive({value: false});
+        const registerShow = ref(false);
         const loading = ref(true);
         const pixCopiaECola = ref('');
+        const loggedIn = userLoggedIn();
         return {
+            registerShow,
             plans,
             dialogVisible,
             loading,
-            pixCopiaECola
+            pixCopiaECola,
+            loggedIn
         }
     },
     methods: {
@@ -86,7 +77,7 @@ export default defineComponent({
         },
 
         async getPix(price: number) {
-            const result = await axios.post("http://localhost:8080" + '/create-pix', {
+            const result = await axios.post("http://localhost:8081" + '/create-pix', {
                 "user_id": 1,
                 "plan": {
                     "id": 0,
@@ -99,20 +90,31 @@ export default defineComponent({
             this.pixCopiaECola = result.data;
         },
 
-        showModal(price: number) {
-            this.getPix(price);
+        async showModal(price: number, plan_id: number) {
+            const { emit } = useEventBus();
+            if(userLoggedIn()) {
+                this.getPix(price);
+                emit(TOGGLE_DIALOG as never);
+                await callUpdatePlan(plan_id+1);
+                await updateUserPlan();
+                emit(USER_UPDATE);
+            }
+            else {
+                console.log("Registre-se")
+                emit(TOGGLE_DIALOG as never);
+            }
 
-            this.dialogVisible = true;
+        },
+        handleClose() {
+            this.dialogVisible.value = true;
         }
     },
     beforeMount() {
         this.loadPlans()
     },
-    components: {
-        ElDialog,
-        ElInput,
-        ElButton,
-        QrCodeVue
-    },
+     components: {
+         PaymentModal,
+         RegisterModal
+     }
 })
 </script>

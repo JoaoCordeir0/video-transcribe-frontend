@@ -45,3 +45,27 @@ export async function callApiMyTranscribe(id) {
         return 'error'
     }    
 }
+
+export async function callUpdatePlan(plan_id: number) {
+    try {
+        const { data } = await axios.post(`${api.url}/user/update-plan`, {
+            plan_id,
+            user_id: getUserID()
+        })
+        return data;
+    } catch {
+        return 'error'
+    }
+}
+
+export async function updateUserPlan() {
+    try {
+        const { data } = await axios.get(`${api.url}/user/update-plan/${getUserID()}`, {
+            headers: api.authBearer2
+        })
+        localStorage.setItem('user-plan-name', data.title)
+        return data
+    } catch {
+        return 'error'
+    }
+}

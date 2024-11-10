@@ -6,13 +6,15 @@
                 <span class="title-tool"> Video Transcribe</span>
             </a>
             <div class="d-lg-none ms-auto me-4">
-                <a href="#" class="navbar-icon bi-person smoothscroll" data-bs-toggle="modal" data-bs-target="#modalLogin"></a>
+                <a href="#" class="navbar-icon bi-person smoothscroll" data-bs-toggle="modal"
+                    data-bs-target="#modalLogin"></a>
             </div>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-                
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-lg-5 me-lg-auto">
                     <li class="nav-item">
@@ -26,14 +28,21 @@
                     </li>
                 </ul>
 
-                <div class="d-none d-lg-block">
-                    <a href="#" class="navbar-icon bi-person smoothscroll" data-bs-toggle="modal" data-bs-target="#modalLogin"></a>
+                <div v-if="!userLogged" class="d-none d-lg-block">
+                    <ul class="navbar-nav ms-lg-5 me-lg-auto">
+                        <li class="nav-item">
+                            <button class="btn btn-link nav-link">Registrar</button>
+                        </li>
+                    </ul>
                 </div>
+                <a href="#" class="navbar-icon bi-person smoothscroll" data-bs-toggle="modal"
+                    data-bs-target="#modalLogin"></a>
             </div>
         </div>
     </nav>
-    
-    <div class="modal fade" id="modalLogin" tabindex="-1" aria-labelledby="modalLoginLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+
+    <div class="modal fade" id="modalLogin" tabindex="-1" aria-labelledby="modalLoginLabel" aria-hidden="true"
+        data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -56,14 +65,16 @@
                         <div class="row d-flex">
                             <div class="col-lg-12 col-md-6 col-12">
                                 <div class="form-floating">
-                                    <input type="email" pattern="[^ @]*@[^ @]*" v-model="email" name="email" id="email" class="form-control" placeholder="E-mail" required>
+                                    <input type="email" pattern="[^ @]*@[^ @]*" v-model="email" name="email" id="email"
+                                        class="form-control" placeholder="E-mail" required>
                                     <label for="floatingInput">E-mail</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-12 col-md-6 col-12">
                                 <div class="form-floating">
-                                    <input type="password" name="password" id="password" v-model="password" class="form-control" placeholder="" required>
+                                    <input type="password" name="password" id="password" v-model="password"
+                                        class="form-control" placeholder="" required>
                                     <label for="floatingInput">Senha</label>
                                 </div>
                             </div>
@@ -78,6 +89,8 @@
         </div>
     </div>
 
+
+
 </template>
 
 <script lang="ts">
@@ -86,6 +99,10 @@ import Modal from './Modal.vue';
 import { apiLogin, userLoggedIn } from '../hooks/useAuth';
 import { getUserEmail, getUserName, getUserPlan } from '../hooks/useUser';
 import { Toast } from '../hooks/useToast';
+import { useEventBus, USER_UPDATE } from '../hooks/useEventBus';
+
+
+const { on } = useEventBus();
 
 export default defineComponent({
 
@@ -97,7 +114,7 @@ export default defineComponent({
         const email = ref()
         const password = ref()
 
-        return {            
+        return {
             userLogged,
             userName,
             userEmail,
@@ -107,9 +124,9 @@ export default defineComponent({
         }
     },
     methods: {
-        async login() {            
+        async login() {
             const result = await apiLogin(this.email, this.password)
-            
+
             if (result.status == 'success') {
                 window.location.reload()
             } else {
@@ -124,7 +141,10 @@ export default defineComponent({
                 this.userEmail = getUserEmail()
                 this.userPlan = getUserPlan()
             }
-        },       
+        },
+        updateInfo() {
+            this.userPlan = getUserPlan()
+        },
         logout() {
             localStorage.clear()
             Toast().fire({ icon: 'info', title: 'Até logo!' })
@@ -133,9 +153,10 @@ export default defineComponent({
     },
     beforeMount() {
         this.checkAuth()
+        on(USER_UPDATE, this.updateInfo)
     },
-    components: { 
-        Modal   
+    components: {
+        Modal
     },
 })
 </script>
