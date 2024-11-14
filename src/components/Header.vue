@@ -26,6 +26,10 @@
                     <li class="nav-item">
                         <a class="nav-link click-scroll" href="/videos">Meus Vídeos</a>
                     </li>
+                    {{ console.log(userPlan) }}
+                    <li class="nav-item" v-if="userPlan == 'Plano Premium Plus'">
+                        <a class="nav-link click-scroll" href="/api">Acesso à API</a>
+                    </li>
                 </ul>
 
                 <div v-if="!userLogged" class="d-none d-lg-block">

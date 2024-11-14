@@ -18,3 +18,17 @@ export async function callApiTranscribeFile(user, file) {
         return 'error'
     }    
 }
+
+export async function callApiSummary(text) {    
+    try {   
+        const { data } = await axios.post(`${api.url}/summary/generate`, {
+            'text': text
+        }, {
+            headers: api.authBearer
+        })
+        return data
+    } catch {
+        return 'error'
+    }    
+}
+

@@ -77,7 +77,7 @@ import { TOGGLE_DIALOG, useEventBus } from '../hooks/useEventBus';
              };
 
              axios.post(`${api.url}/user/register`, data);
-             Toast().fire({ text: "Cadastro realizado com sucesso" })
+             Toast().fire({ icon: "success", text: "Cadastro realizado com sucesso" })
          },
 
          toggle() {

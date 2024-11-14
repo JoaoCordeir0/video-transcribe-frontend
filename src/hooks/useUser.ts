@@ -69,3 +69,26 @@ export async function updateUserPlan() {
         return 'error'
     }
 }
+
+export async function downloadVttApi(id) {
+    try {
+        const { data } = await axios.get(`${api.url}/transcribe/vtt/${id}`, {
+            headers: api.authBearer
+        })
+        return data
+    } catch {
+        return 'error'
+    }
+}
+
+export async function downloadVttPlusApi(id) {
+    try {
+        const { data } = await axios.get(`${api.url}/transcribe/vttplus/${id}`, {
+            headers: api.authBearer
+        })
+        return data
+    } catch {
+        return 'error'
+    }
+}
+

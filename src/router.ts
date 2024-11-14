@@ -3,6 +3,7 @@ import { auth } from './hooks/useAuth'
 
 import Main from './views/Main.vue';
 import Plans from './views/Plans.vue';
+import Api from './views/Api.vue';
 import Video from './views/Video.vue';
 import Videos from './views/Videos.vue';
 import NotFound from './views/NotFound.vue';
@@ -24,6 +25,12 @@ const routes: RouteRecordRaw[] = [
     path: '/video/:id',
     name: 'Video',
     component: Video,
+    meta: { layout: 'default' },
+  },
+  {
+    path: '/api',
+    name: 'Api',
+    component: Api,
     meta: { layout: 'default' },
   },
   {
